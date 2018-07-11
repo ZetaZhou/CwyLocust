@@ -25,7 +25,7 @@ class UserBehavior(TaskSet):
     #         print(rsp_dataII)
 
     @task
-    def RealTimeCharge(self):
+    def RealTimeCharge(self, villsession = None):
 
         values = {}
         values['xnbChargePhone'] = "11111111111"

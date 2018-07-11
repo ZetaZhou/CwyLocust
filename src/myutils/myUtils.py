@@ -121,6 +121,41 @@ def creatSysUser(xzqhlist):
 
     return YHlist
 
+def creatBaseFieldDetailList(basefieldlist):
+    basefielddetaillist = []
+
+    for basefield in basefieldlist:
+
+        for i in range(1, 7):
+            if i  == 6:
+                basefielddetaillist.append([basefield[0], basefield[1], str(8)])
+            else:
+                basefielddetaillist.append([basefield[0], basefield[1], str(i)])
+
+    return basefielddetaillist
+
+def creatBaseTemplateList():
+    basetempdatalist = []
+    for i in range(20000):
+        tempname = ''.join(list(map(lambda x: dict[x], str(i))))
+        basetempdatalist.append([tempname])
+
+    return basetempdatalist
+
+def creatBaseTemplateDetailList(datalist):
+    basetemplatelist = []
+
+    tempindex = 1
+    for i in range(20000):
+
+        for n in range(1, 12 + 1):
+
+            data = datalist.pop(0)
+            basetemplatelist.append([str(tempindex), data[0], data[1], data[2], data[3], 'v' + str(n), str(n)])
+        tempindex += 1
+    return basetemplatelist
+
+
 def filterXzqh(data):
     if len(data[0]) == 11:
         return data

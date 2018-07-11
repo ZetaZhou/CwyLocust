@@ -4,7 +4,7 @@ __author__ = 'Administrator'
 import cx_Oracle
 
 from myutils.myUtils import *
-
+from myutils.sqlSelect import *
 
 class OrclInsert:
 
@@ -38,6 +38,15 @@ class OrclInsert:
 
         cr.executemany(None, datalist)
 
+    def insertBaseFieldDetail(self, datalist):
+        db = self.db
+        cr = db.cursor()
+
+        cr.prepare("INSERT INTO BASE_FIELD_DETAIL (FIELD_DETAIL_ID, FIELD_ID, FIELD_NAME, FIELD_TYPE, INPUT_TYPE, INPUT_MUST, ADD_MAN, ADD_TIME, UPD_TIME, VERSION)" \
+            " VALUES (SEQ_BASE_FIELD_DETAIL.NEXTVAL, :1, :2, 'buss', :3, '0', '10000498', sysdate, sysdate, '1')")
+
+        cr.executemany(None, datalist)
+
     def insertSysUser(self, datalist):
         db = self.db
         cr = db.cursor()
@@ -47,96 +56,23 @@ class OrclInsert:
 
         cr.executemany(None, datalist)
 
-    def getInstCode(self, xzqh):
-
-        db = self.db
-        cr = db.cursor()
-        sql = "select INST_CODE from SYS_INST where inst_code like '%s' order by inst_code" %xzqh
-        cr.execute(sql)
-        data = cr.fetchall()
-        # print (len(data))
-        # for i in data:
-        #     print (i)
-        return  data
-
-    def getBaseField(self):
-
-        db = self.db
-        cr = db.cursor()
-        sql = "select * from BASE_FIELD_DETAIL where field_type = 'base' order by to_number(field_detail_id) desc"
-        cr.execute(sql)
-        data = cr.fetchall()
-        # for i in data:
-        #     print (i)
-
-        return data
-
-    def getDataCust(self):
-
-        db = self.db
-        cr = db.cursor()
-        sql = "select * from DATA_CUST t where t.inst_code = '14010501'"
-        cr.execute(sql)
-        data = cr.fetchall()
-        # for i in data:
-        #     print (i)
-
-        return data
-
-    def setBaseTempDetal(self, dataList):
-
-        db  = self.db
-        cr = db.cursor()
-        index = 1
-        # print (dataList)
-        for i in dataList:
-            colums = 'v' + str(index)
-            sql = "INSERT INTO BASE_TEMPLATE_DETAIL VALUES (SEQ_BASE_TEMPLATE_DETAIL.NEXTVAL, 1, '%s','%s', '%s', 1, '%s', '%s', sysdate, sysdate, 1, '%s')"  %(i[1], i[0], i[2], i[4], colums, index)
-            print(sql)
-            cr.execute(sql)
-            index += 1
-            db.commit()
-
-    def setDataTask(self, dataList):
-
+    def insertBaseTemplate(self, datalist):
         db = self.db
         cr = db.cursor()
 
-        index = 1
-        sData = ''
-        lData = ''
+        cr.prepare("INSERT INTO BASE_TEMPLATE (TEMPLATE_ID, TEMPLATE_NAME, TEMPLATE_DEPT, OWNER, CLICK_NUM, FLAG, ADD_TIME, UPD_TIME, VERSION)" \
+                   " VALUES (SEQ_BASE_TEMPLATE.NEXTVAL , :1, '1', '10000498', '1', '1', sysdate, sysdate, '1')")
 
-        for i in range(1, 100):
-            if i < 51:
-                sData = ",'" + str(i)+ "'" + sData
-            else:
-                lData = ",'' " + lData
+        cr.executemany(None, datalist)
 
-        lastData = sData + lData
-        # print (lastData)
-
-        for i in dataList:
-            sql = "INSERT INTO DATA_TASK " \
-                  "VALUES (SEQ_DATA_TASK.NEXTVAL, 1, 1, '%s',  '14010501', '%s', '%s' %s, Null, 1, '10000445', '10000445', sysdate, sysdate, 1)" %(i[0], i[3], i[2],lastData)
-            print(sql)
-            cr.execute(sql)
-            index += 1
-            db.commit()
-
-    def getBaseTempDetail(self):
-        datalist = []
+    def insertBaseTemplateDetail(self, datalist):
         db = self.db
         cr = db.cursor()
 
-        sql = 'select columns, base_columns from BASE_TEMPLATE_DETAIL'
-        cr.execute(sql)
-        data = cr.fetchall()
+        cr.prepare("INSERT INTO BASE_TEMPLATE_DETAIL (TEMPLATE_DETAIL_ID, TEMPLATE_ID, FIELD_ID, FIELD_DETAIL_ID, FIELD_NAME, INPUT_TYPE, COLUMNS, ADD_TIME, UPD_TIME, VERSION, FIELD_ORDER)" \
+                   " VALUES (SEQ_BASE_TEMPLATE_DETAIL.NEXTVAL , :1, :2, :3, :4, :5, :6, sysdate, sysdate,'1', :7)")
 
-        for i in data:
-            if 'Time' in i[1]:
-                datalist.append(i)
-
-        print (datalist)
+        cr.executemany(None, datalist)
 
     def close(self):
         db = self.db
@@ -149,6 +85,7 @@ class OrclInsert:
 
 if __name__ == '__main__':
     insert = OrclInsert()
+    select = oracleSelect()
 
     '''
     添加人表数据
@@ -171,15 +108,15 @@ if __name__ == '__main__':
     添加操作用户数据
     '''
 
-    xzqh = '4201' + '%'
-    xzqhlist = insert.getInstCode(xzqh)                  # 获取行政区划
-    # xzqhlistNew = list(filter(filterXzqh, xzqhlist))
-    # print (xzqhlistNew[0][0][-2:])
-    # print (len(xzqhlistNew))
-
-    sysuserlist = creatSysUser(xzqhlist)
-    print (sysuserlist)
-    insert.insertSysUser(sysuserlist)
+    # xzqh = '4201' + '%'
+    # xzqhlist = insert.getInstCode(xzqh)                  # 获取行政区划
+    # # xzqhlistNew = list(filter(filterXzqh, xzqhlist))
+    # # print (xzqhlistNew[0][0][-2:])
+    # # print (len(xzqhlistNew))
+    #
+    # sysuserlist = creatSysUser(xzqhlist)
+    # print (sysuserlist)
+    # insert.insertSysUser(sysuserlist)
 
     '''        
     添加行政区划
@@ -213,5 +150,38 @@ if __name__ == '__main__':
     # print(basefieldlist)
     # insert.insertBaseField(basefieldlist)
 
+    '''
+    获取云字段列表
+    创建字段详情信息
+    插入字段详情表
+    '''
+    # basefieldlist = select.getBaseField()
+    # # print(baseFieldlist)
+    # basefielddetaillist = creatBaseFieldDetailList(basefieldlist)
+    # # print (basefielddetaillist)
+    # insert.insertBaseFieldDetail(basefielddetaillist)
+
+    '''
+    创建模板数据列表
+    插入模板表
+    '''
+    # basetempdatalist = creatBaseTemplateList()
+    # print(basetempdatalist)
+    # insert.insertBaseTemplate(basetempdatalist)
+
+    '''
+    获取云字段库数据列表
+    获取并创建云字段库详情信息列表
+    '''
+    # basefieldlist = select.getBaseField()
+    # # print (basefieldlist)
+    # basefielddetaillist = select.getBaseFieldDetail(basefieldlist)
+    # print (basefielddetaillist)
+    basefielddetaillist = select.getBaseFieldDetailII()
+    basetemplatelist = creatBaseTemplateDetailList(basefielddetaillist)
+    insert.insertBaseTemplateDetail(basetemplatelist)
+
+
     insert.close()
+    select.close()
 
